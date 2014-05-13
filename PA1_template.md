@@ -4,23 +4,20 @@
 ## Loading and preprocessing the data
 
 First we load the data (Step 1. Load the data)
-```{r}
-data <- read.csv(file = "activity.csv", 
-                   colClasses = c("numeric", "character", "numeric"),
-                   header = TRUE,
-                   sep = ",",
-                   row.names = NULL,
-                   na.strings = "NA"
-                   ) 
 
+```r
+data <- read.csv(file = "activity.csv", colClasses = c("numeric", "character", 
+    "numeric"), header = TRUE, sep = ",", row.names = NULL, na.strings = "NA")
 ```
+
 
 Then we transform the Factor variable to a Date variable (Step 2. Process/transform the data (if necessary) into a format suitable for your analysis)
 
-```{r}
-data$date <- strptime(data[,"date"], "%Y-%m-%d")
 
+```r
+data$date <- strptime(data[, "date"], "%Y-%m-%d")
 ```
+
 
 
 
