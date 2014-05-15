@@ -1,6 +1,6 @@
 # Reproducible Research: Peer Assessment 1
 
-We will use the ggplot2 package throughout this assignment. Additionally we have to set the locales to en (Thursday instead of Donnerstag etc. )
+We will use the ggplot2 package throughout this assignment. Additionally we have to set the locales to en (Thursday instead of Donnerstag etc. ), because the development environmemnt is german.
 
 
 First set the locale to English.
@@ -30,14 +30,14 @@ head(data)
 
 **Step 2. Process/transform the data (if necessary) into a format suitable for your analysis**
 
-We will create a data frame with the sums of steps taken per day.
+We will create a data frame with the sums of steps taken per day. It will be stored in the dayAggregates data frame.
 ```{r createAggregate, echo=TRUE}
 dayAggregates <- aggregate(data[,c("steps")], by=list(data$date), "sum")
 names(dayAggregates) <- c("day","sumOfSteps")
 head(dayAggregates)
 ```
 
-Also we will need a 5-minute interval and the average number of steps taken, averaged across all days (we need to take care of NA values by setting na.rm=TRUE) 
+Also we will need a 5-minute interval and the average number of steps taken (for alter steps), averaged across all days (we need to take care of NA values by setting na.rm=TRUE before running the mean function). It will be stored in the intervalAverages data frame. 
 
 ```{r intervalAverages, echo=TRUE}
 intervalAverages <- aggregate(data[,c("steps")], by=list(data$interval), FUN=function(x) mean(x, na.rm=TRUE))
@@ -51,11 +51,11 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 **Step 1. Make a histogram of the total number of steps taken each day**
    
-
+Here we create the histogram using the ggplot2 qplot function
 ```{r makeHistogram, echo=TRUE, fig.width=10}
 library(ggplot2)
 
-qplot(sumOfSteps, data = dayAggregates,xlab = "number of steps taken each day",ylab = "count", main = "Histogram of the total number of steps taken each day ")
+qplot(sumOfSteps, data = dayAggregates,xlab = "number of steps taken each day",ylab = "count", main = "Histogram of the total number of steps taken each day ", binwidth = round((max(dayAggregates$sumOfSteps,na.rm=TRUE) - min(dayAggregates$sumOfSteps,na.rm=TRUE) ) / 30))
 
 ```   
    
@@ -116,11 +116,10 @@ length(which(is.na(data$steps)))
 
 **2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.**
 
-We will fill the missing steps values using the mean for that 5-minute interval. We will use the round function on the means (the values were previously computed in the variable intervalAverages) to round the missing values to the nearest integer (hence it doesn't make sense to have i.e. 5.4 steps for a day).
+We will fill the missing steps values using the mean for that 5-minute interval. We will use the round function on the means (the values were previously computed in the variable intervalAverages) to round the missing values to the nearest integer (hence it doesn't make sense to have e.g. 5.4 steps for a particular day).
 
-The variable intervalAveragesMulti is just a multiplication of intervalAverages.
-Hence we have 61 days and 288 interval per day, it's lenght is 17568 (and stores the correct mean for each interval).
-We need to be able to use it in the ifelse function below.
+The variable intervalAveragesMulti is just a multiplication (replication) of intervalAverages.
+Hence we have 61 days and 288 intervals per day, it's lenght is 17568 (and stores the correct mean for each interval). This way we are able to use it in the ifelse function below.
 
 **3. Create a new dataset that is equal to the original dataset but with the missing data filled in.**
 
@@ -141,6 +140,7 @@ data[4134,]
 intervalAveragesMulti[4134]
 dataWithoutNA[4134,]
 ```
+So 72 and not 155 is correctly taken.
 
 An example that shows that if a value was not set the computed rounded mean is used.
 ```{r , echo=TRUE}
@@ -159,7 +159,7 @@ length(which(is.na(dataWithoutNA$steps)))
 
 **4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?**
 
-We will create a data frame with the sums of steps taken per day (with NA values replaced be rounded means per interval across all days)
+We will create a data frame with the sums of steps taken per day (with NA values replaced be rounded means per interval across all days). It will be stored in the variable dayAggregateseWithoutNA. 
 ```{r createAggregateWithoutNA, echo=TRUE}
 dayAggregateseWithoutNA <- aggregate(dataWithoutNA[,c("steps")], by=list(data$date), "sum")
 names(dayAggregateseWithoutNA) <- c("day","sumOfSteps")
@@ -170,11 +170,11 @@ Now that we have the data frame, let's create the histogram:
 ```{r makeHistogramWithoutNA, echo=TRUE, fig.width=10}
 library(ggplot2)
 
-qplot(sumOfSteps, data = dayAggregateseWithoutNA,xlab = "number of steps taken each day (NA replaced with rounded means)",ylab = "count", main = "Histogram of the total number of steps taken each day ")
+qplot(sumOfSteps, data = dayAggregateseWithoutNA,xlab = "number of steps taken each day (NA replaced with rounded means)",ylab = "count", main = "Histogram of the total number of steps taken each day", binwidth = round((max(dayAggregateseWithoutNA$sumOfSteps,na.rm=TRUE) - min(dayAggregateseWithoutNA$sumOfSteps,na.rm=TRUE) ) / 30))
 
 ```   
 
-   Let us now compute the mean of steps taken per day (NA values are repalced with rounded means per interval across all days)
+   Let us now compute the mean of steps taken per day (NA values are replaced with rounded means per interval across all days)
 ```{r meanWithoutNA, echo=TRUE}
 meanOfStepsperDayWithoutNA <- mean(dayAggregateseWithoutNA$sumOfSteps)
 meanOfStepsperDayWithoutNA
@@ -205,7 +205,7 @@ medianOfStepsperDayWithoutNA
 ``` 
 Finally lets us take a look how the histograms differ. We will plot them together.
 
-First we will nedd a 5-minute interval and the average number of steps taken, aggregated across all days, with previously NA values replaced by mean rounded t nearest integer. 
+First we will need a 5-minute interval and the average number of steps taken, aggregated across all days, with previously NA values replaced by mean rounded to nearest integer. 
 
 ```{r intervalAveragesNA, echo=TRUE}
 intervalAveragesWithoutNA <- aggregate(dataWithoutNA[,c("steps")], by=list(dataWithoutNA$interval), FUN=mean)
