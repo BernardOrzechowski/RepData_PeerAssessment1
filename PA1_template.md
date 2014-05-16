@@ -521,4 +521,4 @@ print(finalPlot)
 ![plot of chunk finalPlot](figure/finalPlot.png) 
 
 
-
+From the plot we can read that there are some minor differences, but overall tha patern is similar.

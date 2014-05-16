@@ -263,4 +263,4 @@ finalPlot <- finalPlot + theme(strip.background = element_rect(fill = "lightpink
 print(finalPlot)
 ```
 
-
+From the plot we can read that there are some minor differences, but overall tha patern is similar.
